@@ -36,6 +36,7 @@ pub trait DeviceControl<T> {
     fn set_device_volume_by_name(&mut self, name: &str, volume: &ChannelVolumes);
     fn increase_device_volume_by_percent(&mut self, index: u32, delta: f64);
     fn decrease_device_volume_by_percent(&mut self, index: u32, delta: f64);
+    fn set_device_mute(&mut self, index: u32, mute: bool) -> Result<(), ControllerError>;
 }
 
 pub trait AppControl<T> {
@@ -206,6 +207,15 @@ impl DeviceControl<DeviceInfo> for SinkController {
                 self.handler.wait_for_operation(op).ok();
             }
         }
+    }
+
+    fn set_device_mute(&mut self, index: u32, mute: bool) -> Result<(), ControllerError> {
+        let _ = self.get_device_by_index(index)?;
+        let op = self.handler.introspect
+            .set_sink_mute_by_index(index, mute, None);
+        self.handler.wait_for_operation(op)?;
+
+        Ok(())
     }
 }
 
@@ -472,6 +482,15 @@ impl DeviceControl<DeviceInfo> for SourceController {
                 self.handler.wait_for_operation(op).ok();
             }
         }
+    }
+
+    fn set_device_mute(&mut self, index: u32, mute: bool) -> Result<(), ControllerError> {
+        let _ = self.get_device_by_index(index)?;
+        let op = self.handler.introspect
+            .set_source_mute_by_index(index, mute, None);
+        self.handler.wait_for_operation(op)?;
+
+        Ok(())
     }
 }
 
