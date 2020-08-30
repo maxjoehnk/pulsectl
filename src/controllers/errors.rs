@@ -1,6 +1,7 @@
 use std::fmt;
 
 use crate::PulseCtlError;
+use std::error::Error;
 
 /// if the error occurs within the Mainloop, we bubble up the error with
 /// this conversion
@@ -27,6 +28,14 @@ impl fmt::Debug for ControllerError {
         write!(f, "[{}]: {}", error_string, self.message)
     }
 }
+
+impl fmt::Display for ControllerError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{:?}", self)
+    }
+}
+
+impl Error for ControllerError {}
 
 pub(crate) enum ControllerErrorType {
     PulseCtlError,
